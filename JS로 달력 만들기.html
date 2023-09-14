@@ -79,9 +79,19 @@
             cursor: pointer;
         }
 
+        .holiday {
+            color: red; /* 공휴일 텍스트 색상을 빨간색으로 설정 */
+        }
     </style>
+
+    
+
         <script>
-            window.onload = function () { buildCalendar(); }    // 웹 페이지가 로드되면 buildCalendar 실행
+            window.onload = function () { 
+                const yearSelect = document.getElementById("yearSelect");
+                const monthSelect = document.getElementById("monthSelect");
+                populateYearMonthOptions(); 
+                buildCalendar(); }    // 웹 페이지가 로드되면 buildCalendar 실행
     
             let nowMonth = new Date();  // 현재 달을 페이지를 로드한 날의 달로 초기화
             let today = new Date();     // 페이지를 로드한 날짜를 저장
@@ -114,9 +124,9 @@
                     nowColumn.appendChild(newDIV);
     
                     //토요일은 파란색, 일요일은 빨간색
-                    if (nowDay.getDay() === 0) {
+                    if (nowDay.getDay() == 0) {
                         newDIV.style.color = "red";
-                    } else if (nowDay.getDay() === 6) {
+                    } else if (nowDay.getDay() == 6) {
                         newDIV.style.color = "blue";
                     }
 
@@ -140,26 +150,74 @@
                             choiceDate(this); 
                         };
                     }
-                    if (nowDay.getDay() === 6) { // 토요일인 경우
+                    if (nowDay.getDay() == 6) { // 토요일인 경우
                         nowRow = tbody_Calendar.insertRow();
                     }
+
+
+                    // 공휴일 설정
+                    let holidayStart = new Date(2023, 8, 28); // 2023년 9월 28일
+                    let holidayEnd = new Date(2023, 9, 3); // 2023년 10월 3일
+
+                    if (
+                        nowDay >= holidayStart &&
+                        nowDay <= holidayEnd
+                    ) {
+                        newDIV.classList.add("holiday"); // 공휴일 클래스 추가
+                    }   
+                    
+                    // 크리스마스 설정 (매년 12월 25일)
+                    let christmas = new Date(nowDay.getFullYear(), 11, 25); // 11은 12월을 나타냅니다 (0부터 시작하므로)
+                    if (
+                        nowDay.getMonth() === christmas.getMonth() &&
+                        nowDay.getDate() === christmas.getDate()
+                    ) {
+                        newDIV.classList.add("holiday"); // 크리스마스를 공휴일로 표시
+                    }
+
                 }
                 
-                // 2023년 9월 28일부터 2023년 10월3일까지 빨간색으로 칠하기
-                let startDay = new Date(2023, 9, 28);
-                let endDay = new Date(2023, 10, 3);
 
-                for (let i = 0; i < tbody_Calendar.rows.length; i++) {
-                    for (let j = 0; j < tbody_Calendar.rows[i].cells.length; j++) {
-                        let cell = tbody_Calendar.rows[i].cells[j];
-                        let date = cell.querySelector("p").innerHTML;
-                        let newDate = new Date(date);
+            }
 
-                        if (newDate.getMonth() === startDay.getMonth() && newDate.getFullYear() === startDay.getFullYear() && newDate.getDate() >= startDay.getDate() && newDate.getDate() <= endDay.getDate()) {
-                            cell.style.color = "red";
-                        }
-                    }
+
+            
+            // 연도와 월 선택 드롭다운 메뉴를 가져옵니다.
+
+
+            // 연도와 월 옵션을 동적으로 생성합니다.
+            function populateYearMonthOptions() {
+                const currentYear = new Date().getFullYear();
+                for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                    const option = document.createElement("option");
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
                 }
+
+                const months = [
+                    "1월", "2월", "3월", "4월", "5월", "6월",
+                    "7월", "8월", "9월", "10월", "11월", "12월"
+                ];
+
+                for (let i = 0; i < 12; i++) {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = months[i];
+                    monthSelect.appendChild(option);
+                }
+
+                // 드롭다운 메뉴 초기값 설정
+                yearSelect.value = nowMonth.getFullYear();
+                monthSelect.value = nowMonth.getMonth();
+            }
+
+            // 드롭다운 메뉴가 변경될 때마다 달력을 업데이트합니다.
+            function updateCalendar() {
+                const selectedYear = parseInt(yearSelect.value);
+                const selectedMonth = parseInt(monthSelect.value);
+                nowMonth = new Date(selectedYear, selectedMonth, 1);
+                buildCalendar();
             }
     
             // 날짜 선택
@@ -194,8 +252,8 @@
                 const date = new Date();
                 nowMonth = date; // 현재 날짜로 현재 월을 설정
                 buildCalendar(); // 달력 다시 생성
-            }       
-                 
+            }  
+                       
         </script>
 </head>
 <body>
@@ -205,11 +263,19 @@
                 <tr>
                     <td onClick="prevCalendar();" style="cursor:pointer;">&#60;</td>
                     <td colspan="5">
-                        <span id="calYear"></span>년
-                        <span id="calMonth"></span>월
+                        <span id="calYear"></span>년    
+                        <span id="calMonth"></span>월                      
                         <span onClick="goToday();" style="cursor:pointer; color: yellowgreen;" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Today</span>
                     </td>
                     <td onClick="nextCalendar();" style="cursor:pointer;">&#62;</td>
+                      
+                </tr>
+                <tr style="height: 10px;">
+                    <td style="display: flex; height: 25px;">
+                        &nbsp;&nbsp;
+                        <select id="yearSelect" onchange="updateCalendar()" style="border: none;"></select>
+                        <select id="monthSelect" onchange="updateCalendar()" style="border: none;"></select> 
+                    </td>
                 </tr>
                 <tr>
                     <td>일</td>
