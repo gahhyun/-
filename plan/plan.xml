@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.ottt.ottt.dao.plan.planMapper">
+	
+	<select id="selectPlan" parameterType="int" resultType="PlanDTO">
+		select 
+			plan_no
+			, plan_date
+			, user_no
+			, paln_content
+		from tb_plan
+	</select>      	
+	
+	<insert id="insertPlan" parameterType="PlanDTO">
+		INSERT INTO tb_plan
+		(plan_date, user_no, paln_content)
+		VALUES('#{plan_date}', '#{user_no}', '#{paln_content}');
+	</insert>
+	
+	<update id="updatePlan" parameterType="PlanDTO">
+		update tn_plan
+		set 
+			plan_date=#{plan_date}
+			, user_no=#{user_no}
+			, paln_content=#{paln_content}
+		where plan_no=#{plan_no}
+	</update>
+	
+	<delete id="deletePlan" parameterType="int">
+		delete from tb_plan
+		where plan_no = #{plan_no}
+	</delete>
+      
+      
+      
+      
+      
+      
+      
+      
+</mapper>
