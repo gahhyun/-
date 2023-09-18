@@ -1,0 +1,2 @@
+전체 컨트롤러에 @RestController가 있으면 비동기통신으로하는 컨트롤러에 따로  @ResponseBody를 입력하지 않아도 된다
+//@RestController란? 비동기 통신용 컨트롤러, model OR view를 리턴하지 않는다.
