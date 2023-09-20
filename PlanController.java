@@ -1,9 +1,13 @@
 package com.ottt.ottt.controller.plan;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.ottt.ottt.controller.community.CommentController;
 import com.ottt.ottt.dao.login.LoginUserDao;
 import com.ottt.ottt.dto.CommentDTO;
 import com.ottt.ottt.dto.PlanDTO;
@@ -21,18 +26,20 @@ import com.ottt.ottt.dto.UserDTO;
 import com.ottt.ottt.service.plan.PlanServiceImpl;
 
 @Controller
-@RequestMapping(value = "/plan/")
+@RequestMapping(value = "/plan")
 public class PlanController {
 
 	@Autowired
 	PlanServiceImpl planService;
 	@Autowired
 	LoginUserDao loginUserDao;
+	
+	private static final Logger logger = LoggerFactory.getLogger(PlanController.class);
 
 	
-	  @GetMapping("/planList") public String planList(HttpSession session, Model m) throws Exception{
-			  
-			  //PlanDTO plan = planService.selectPlan(plan_no); m.addAttribute("plan", plan);
+	  @GetMapping("/planList") 
+	  public String planList(HttpSession session, Model m) throws Exception{
+
 			  
 			  if(session.getAttribute("id") !=null) { 
 				  UserDTO userDTO = loginUserDao.select((String) session.getAttribute("id"));
@@ -43,19 +50,19 @@ public class PlanController {
 	  }
 	  
 		//일정 목록 조회  ajax로 목록 가져오기...
-	  /*
-	  @ResponseBody
-		@GetMapping("/getPlanList")
-		public List<CommentDTO> getPlanList(HttpSession session) throws Exception {
-			
-	  		UserDTO userDTO = loginUserDao.select((String)session.getAttribute("id"));
-			if(userDTO != null) {
-				dto.setUser_no(userDTO.getUser_no());
-			}
-			return commentService.getCommentList(dto);
-		}
+    @ResponseBody
+    @GetMapping("/getPlanList")
+    public List<PlanDTO> getPlanList(HttpSession session) throws Exception{
+    	
+    	logger.info("/plan/getPlanList >>>>>> 호출 ");
+		UserDTO userDTO = loginUserDao.select((String)session.getAttribute("id"));
+		Integer no = userDTO.getUser_no();
+		return planService.planList(no);
+    	
+    }
+		 
 	  	
-	  	*/
+	  	
 
 	
 	@PostMapping("/write")

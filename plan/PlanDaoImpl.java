@@ -1,5 +1,7 @@
 package com.ottt.ottt.dao.plan;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,13 @@ public class PlanDaoImpl implements PlanDao{
 	@Autowired
 	private SqlSession session;
 	private static String namespace = "com.ottt.ottt.dao.plan.planMapper.";
+	
+	
+	@Override
+	public List<PlanDTO> planList(Integer user_no) throws Exception {
+		// TODO Auto-generated method stub
+		return session.selectList(namespace+"planList", user_no);
+	}
 
 	@Override
 	public PlanDTO selectPlan(Integer plan_no) throws Exception {
@@ -36,5 +45,7 @@ public class PlanDaoImpl implements PlanDao{
 		// TODO Auto-generated method stub
 		return session.delete(namespace+"deletePlan", plan_no);
 	}
+
+
 
 }

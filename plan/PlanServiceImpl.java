@@ -1,5 +1,7 @@
 package com.ottt.ottt.service.plan;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,12 @@ public class PlanServiceImpl implements PlanService{
 	@Autowired
 	PlanDaoImpl planDao;
 
+	@Override
+	public List<PlanDTO> planList(Integer user_no) throws Exception {
+		// TODO Auto-generated method stub
+		return planDao.planList(user_no);
+	}
+	
 	@Override
 	public PlanDTO selectPlan(Integer plan_no) throws Exception {
 		// TODO Auto-generated method stub
@@ -35,5 +43,7 @@ public class PlanServiceImpl implements PlanService{
 		// TODO Auto-generated method stub
 		return planDao.deletePlan(plan_no);
 	}
+
+
 
 }

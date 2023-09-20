@@ -1,14 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>    
+<c:set var="user_no" value="${sessionScope.user_no}" />
+<c:set var="loginId" value="${sessionScope.id}" />
+<c:set var="loginout" value="${sessionScope.id == null ? 'logout' : 'login'}" />
+<c:set var="loginoutlink" value="${sessionScope.id==null ? '/login' : '/mypage'}" />
+<c:set var="path" value="${pageContext.request.contextPath}"/>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>캘린더</title>
-	
-	    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>달력</title>
+    	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script> 
+    	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    	
+
     <style>
         @import url('https://fonts.googleapis.com/css?family=Questrial&display=swap');
 
@@ -220,8 +232,23 @@
 	                <div id="input-list" class="input-list"></div>
 	              </div>
 	        </div>
-
 	</form>
+	
+    	<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+     		<div class="modal-dialog modal-dialog-centered">
+       		<div class="modal-content">
+          		<div class="modal-header">
+            		<h1 class="modal-title fs-5" id="exampleModalLabel">알림</h1>
+            		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          		</div>
+          		<div class="modal-body body"></div>
+          		<div class="modal-footer">
+            		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+          		</div>
+        	</div>
+      	</div>
+   	</div>
+	
     </div>
 	 <script>
 			document.addEventListener("DOMContentLoaded", function() {
@@ -426,14 +453,13 @@
             	
 					//ajax-get방식 축약버전 호출방식
 					$.get(
-							"/ottt/dddd/dddd/getPlanList"
+							"/ottt/plan/getPlanList"
 				    		, function(data){
 								//일정목록 호출 ajax 결과
 								console.log(data);
-					
 							}
 					);
-				)	
+
 			});
                        
         </script>	
