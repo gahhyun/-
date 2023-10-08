@@ -1,5 +1,10 @@
 package com.ottt.ottt.controller.plan;
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,18 +14,19 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.ottt.ottt.controller.community.CommentController;
 import com.ottt.ottt.dao.login.LoginUserDao;
-import com.ottt.ottt.dto.CommentDTO;
 import com.ottt.ottt.dto.PlanDTO;
 import com.ottt.ottt.dto.UserDTO;
 import com.ottt.ottt.service.plan.PlanServiceImpl;
@@ -38,15 +44,20 @@ public class PlanController {
 
 	
 	  @GetMapping("/planList") 
-	  public String planList(HttpSession session, Model m) throws Exception{
+	  public String planList(Integer user_no, HttpSession session, Model m) throws Exception{
 
+		  try {
+			  
+			  List<PlanDTO> planList = planService.planList(user_no);
+			  m.addAttribute("planList", planList);
 			  
 			  if(session.getAttribute("id") !=null) { 
 				  UserDTO userDTO = loginUserDao.select((String) session.getAttribute("id"));
 				  m.addAttribute("userDTO", userDTO); }
-			  
-			  return "plan/planList"; 
+			
+		  } catch  (Exception e) {e.printStackTrace();}
 
+			  return "plan/planList"; 
 	  }
 	  
 		//일정 목록 조회  ajax로 목록 가져오기...
@@ -60,37 +71,67 @@ public class PlanController {
 		return planService.planList(no);
     	
     }
-		 
-	  	
-	  	
-
-	
-	@PostMapping("/write")
-	public String writePlan(PlanDTO planDTO, HttpSession session, Model m, RedirectAttributes rattr) {
-
-		System.out.println(">>>>>>>>>>>/plan/write>>>>>>>>>>");
-		System.out.println("/plan/write planDTO >>>>>>>>>>> " + planDTO.toString());
+    
+    
+    @ResponseBody
+    @PostMapping("/insertPlan")
+    public Map<String, Object> insertPlan(PlanDTO planDTO, HttpSession session) throws Exception{
+    	
+		logger.info("/plan/insertPlan >>>>>> 호출 ");
+		logger.info("planDTO>>>>>>>>>>> : "+planDTO.toString());
 		
-		try {
-				String writer = (String) session.getAttribute("id");
-				UserDTO userDTO = loginUserDao.select(writer);
+		Map<String, Object> result = new HashMap<String,Object>();
 		
-				planDTO.setUser_no(userDTO.getUser_no());
+		UserDTO userDTO = loginUserDao.select((String)session.getAttribute("id"));
+		if(userDTO != null) {
+			 try {
+		            planDTO.setUser_no(userDTO.getUser_no());
+		            
+		            // PlanDTO를 사용하여 서비스 계층에 일정을 삽입
+		            if (planService.insertPlan(planDTO) > 0) {
+		                result.put("result", 1);
+		            } else {
+		                result.put("result", 0);
+		            }
+		        } catch (ParseException e) {
+		            e.printStackTrace();
+		            result.put("result", 0);
+		        }
+		    } else {
+		        logger.info("로그인이 필요합니다.");    // 추후 예외처리
+		        result.put("result", 0);
+		    }
 
-		
-				int insertResult = planService.insertPlan(planDTO);
-				
-				if (planService.insertPlan(planDTO) != 1) {
-					throw new Exception("WRITE FAIL!");
-				}
-				
-				return "redirect:/plan/planList";
-				
-		} catch (Exception e) {
-			e.printStackTrace();e.printStackTrace();
-			return "error";
+		    return result;
 		}
+	
+    
+  /*  @ResponseBody
+    @PostMapping("/insertPlan")
+    public Map<String, Object> insertPlan(String plan_date, String plan_content, HttpSession session) throws Exception {
+        logger.info("/plan/insertPlan >>>>>> 호출 ");
 
-	}
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        UserDTO userDTO = loginUserDao.select((String) session.getAttribute("id"));
+        if (userDTO != null) {
+            PlanDTO planDTO = new PlanDTO();
+            planDTO.setUser_no(userDTO.getUser_no());
+            planDTO.setPlan_date(plan_date);
+            planDTO.setPlan_content(plan_content);
+
+            if (planService.insertPlan(planDTO) > 0) {
+                result.put("result", 1);
+            } else {
+                result.put("result", 0);
+            }
+        } else {
+            logger.info("로그인이 필요합니다."); // 추후 예외처리
+        }
+
+        return result;
+    }
+	  	
+	  	*/
 
 }

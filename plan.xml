@@ -26,9 +26,22 @@
 	</select>      	
 	
 	<insert id="insertPlan" parameterType="PlanDTO">
+	    <selectKey resultType="Integer" keyProperty="plan_no" order="BEFORE">
+        		SELECT (SELECT COALESCE(MAX(plan_no), 0) FROM tb_plan) + 1	/*마지막 플랜번호를 발행한다*/
+	    </selectKey> 
 		INSERT INTO tb_plan
-		(plan_date, user_no, plan_content)
-		VALUES('#{plan_date}', '#{user_no}', '#{plan_content}');
+		(
+			plan_no
+			, plan_date
+			, user_no
+			, plan_content
+		)
+		VALUES(
+			${plan_no}
+			, TO_DATE(#{plan_date}, 'yyyy-MM-dd')
+			, #{user_no}
+			, #{plan_content}
+		)
 	</insert>
 	
 	<update id="updatePlan" parameterType="PlanDTO">
